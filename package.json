@@ -1,0 +1,23 @@
+{
+  "name": "nodeproject",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/LiamStammeleerEhb/nodeproject#readme",
+  "bugs": {
+    "url": "https://github.com/LiamStammeleerEhb/nodeproject/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/LiamStammeleerEhb/nodeproject.git"
+  },
+  "license": "ISC",
+  "author": "Liam Stammeleer",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
