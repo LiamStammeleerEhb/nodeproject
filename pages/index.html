@@ -6,6 +6,19 @@
     <title>Home</title>
 </head>
 <body>
-    <h1>Home page</h1><a href="login">Login</a><br>
+    <h1>Home page</h1>
+    <a href="login">Login</a> <a href="">Bekijk API</a><br>
+    <hr />
+    <form method="GET" action="/">
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            <!-- categories go here -->
+        </select>
+        <button type="submit">Filter</button>
+    </form>
+
+    <div id="articles">
+        <!-- Articles will be loaded here -->
+    </div>
 </body>
 </html>
