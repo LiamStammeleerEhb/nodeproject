@@ -3,8 +3,12 @@ import session from 'express-session';
 import path from "path";
 import db from "./db.js";
 import fs from "fs";
+import cors from "cors";
 
 const app = express();
+const ARTICLES_PER_PAGE = 5;
+
+app.use(cors());
 
 function requireAdmin(req, res, next) {
     if (!req.session.loggedIn) {
@@ -36,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 app.get("/", (req, res) => {
     const category = req.query.category || "";
     const page = parseInt(req.query.page) || 1;
-    const ARTICLES_PER_PAGE = 5;
+    
     const offset = (page - 1) * ARTICLES_PER_PAGE;
 
     // 1️⃣ Load categories
@@ -576,6 +580,128 @@ app.get("/admin/categories/delete/:id", requireAdmin, (req, res) => {
         res.redirect("/admin/categories");
     });
 });
+
+app.get("/infoapi", (req, res) => {
+    res.sendFile(path.resolve("pages/infoapi.html"));
+});
+
+
+app.get("/api/categories", (req, res) => {
+    const sql = `
+        SELECT categoryID, categoryname
+        FROM tblcategories
+        ORDER BY categoryname
+    `;
+
+    db.query(sql, (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        res.json(results);
+    });
+});
+
+app.get("/api/articles", (req, res) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = ARTICLES_PER_PAGE;
+    const category = req.query.category || "";
+
+    const offset = (page - 1) * limit;
+
+    let whereClause = "";
+    let params = [];
+
+    if (category) {
+        whereClause = "WHERE c.categoryname = ?";
+        params.push(category);
+    }
+
+    const sql = `
+        SELECT
+            a.articleID,
+            a.articlename,
+            a.articlecontent,
+            a.publishedon,
+            u.username,
+            c.categoryname
+        FROM tblarticles a
+        JOIN tblusers u ON a.userid = u.userid
+        JOIN tblcategories c ON a.categoryID = c.categoryID
+        ${whereClause}
+        ORDER BY a.publishedon DESC
+        LIMIT ? OFFSET ?
+    `;
+
+    params.push(limit, offset);
+
+    db.query(sql, params, (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        const articles = results.map(a => ({
+            articleID: a.articleID,
+            title: a.articlename,
+            content: a.articlecontent,
+            publishedon: a.publishedon,
+            author: a.username,
+            category: a.categoryname
+        }));
+
+        res.json({
+            page,
+            limit,
+            articles
+        });
+    });
+});
+
+app.get("/api/articles/:id", (req, res) => {
+    if (!Number.isInteger(Number(req.params.id))) {
+        return res.status(400).json({ error: "Invalid ID" });
+    }
+
+    const sql = `
+        SELECT
+            a.articleID,
+            a.articlename,
+            a.articlecontent,
+            a.publishedon,
+            u.username,
+            c.categoryname
+        FROM tblarticles a
+        JOIN tblusers u ON a.userid = u.userid
+        JOIN tblcategories c ON a.categoryID = c.categoryID
+        WHERE a.articleID = ?
+        LIMIT 1
+    `;
+
+    db.query(sql, [req.params.id], (err, results) => {
+        if (err) {
+            console.error(err);
+            return res.status(500).json({ error: "Database error" });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).json({ error: "Article not found" });
+        }
+
+        const a = results[0];
+
+        res.json({
+            articleID: a.articleID,
+            title: a.articlename,
+            content: a.articlecontent,
+            publishedon: a.publishedon,
+            author: a.username,
+            category: a.categoryname
+        });
+    });
+});
+
 
 
 
