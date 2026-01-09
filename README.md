@@ -11,6 +11,7 @@ npm install
 node index.js
 ~~~
 Thats it. Nu runt de applicatie op poort :3000
+Je kunt gewoon gaan naar http://localhost:3000/
 
 # Bronnen
 Ik heb niet veel bronnen gebruikt. Wat dia's van de les enzo. Maar niet echt grote zaken. Ik was al bezig met node.js tijdens ITproject. Hierbij had Steven geholpen de router enzo op te zetten.
