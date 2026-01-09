@@ -10,7 +10,7 @@ Daarna voert u gewoon de volgende commands uit
 npm install
 node index.js
 ~~~
-Thats it. Nu runt de applicatie op poort :3000
+Thats it. Nu runt de applicatie op poort :3000.
 Je kunt gewoon gaan naar http://localhost:3000/
 
 # Bronnen
